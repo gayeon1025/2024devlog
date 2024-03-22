@@ -27,6 +27,23 @@ public class StudentByNameServlet extends HttpServlet {
     );
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getPathInfo();
+        if (name == null) {
+            getAllStudents(response);
+        } else {
+            getStudentByName(name, response);
+        }
+    }
+
+    private void getAllStudents(HttpServletResponse response) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String responseJson = objectMapper.writeValueAsString(students);
+
+        response.setStatus(200);
+        response.setContentType("application/json");
+        response.getWriter().print(responseJson);
+    }
+
+    private void getStudentByName(String name, HttpServletResponse response) throws IOException {
         Optional<Student> student = students.stream()
                 .filter(it -> it.name().equals(name.substring(1)))
                 .findFirst();
