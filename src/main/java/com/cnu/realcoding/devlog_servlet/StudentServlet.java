@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // GET
 // 전체 학생 조회 : /students
@@ -28,12 +29,43 @@ public class StudentServlet extends HttpServlet {
     );
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String name = request.getPathInfo();
+        if (name == null) {
+            getAllStudents(response);
+        } else {
+            getStudentByName(name, response);
+        }
+    }
+
+    private void getAllStudents(HttpServletResponse response) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         String responseJson = objectMapper.writeValueAsString(students);
 
         response.setStatus(200);
         response.setContentType("application/json");
         response.getWriter().print(responseJson);
+    }
+
+    private void getStudentByName(String name, HttpServletResponse response) throws IOException {
+        Optional<Student> student = students.stream()
+                .filter(it -> it.name().equals(name.substring(1)))
+                .findFirst();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (student.isEmpty()) {
+            response.setStatus(404);
+            response.setContentType("application/json");
+            record ErrorResponse(String error) {}
+            ErrorResponse errorResponse = new ErrorResponse("존재하지 않는 학생입니다.");
+            String errorJson = objectMapper.writeValueAsString(errorResponse);
+            response.getWriter().print(errorJson);
+        } else {
+
+            String responseJson = objectMapper.writeValueAsString(student.get());
+            response.setStatus(200);
+            response.setContentType("application/json");
+            response.getWriter().print(responseJson);
+        }
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
