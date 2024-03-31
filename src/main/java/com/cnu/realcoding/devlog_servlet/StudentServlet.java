@@ -35,4 +35,30 @@ public class StudentServlet extends HttpServlet {
         response.setContentType("application/json");
         response.getWriter().print(responseJson);
     }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String requestJson = parseRequestBody(request);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Student student = objectMapper.readValue(requestJson, Student.class);
+
+            students.add(student);
+
+            response.setStatus(200);
+            response.setContentType("application/json");
+            response.getWriter().print(objectMapper.writeValueAsString(student));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String parseRequestBody(HttpServletRequest request) throws IOException {
+        BufferedReader reader = request.getReader();
+        StringBuilder stringBuilder = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+        return stringBuilder.toString();
+    }
 }
