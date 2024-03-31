@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,12 @@ public class StudentServlet extends HttpServlet {
     record Student(String name, Integer grade) {}
 
     // DB 대신 List로 대체
-    List<StudentServlet2.Student> students = new ArrayList<>(
+    List<Student> students = new ArrayList<>(
             List.of(
-                    new StudentServlet2.Student("jisoo", 1),
-                    new StudentServlet2.Student("jennie", 2),
-                    new StudentServlet2.Student("rose", 2),
-                    new StudentServlet2.Student("lisa", 4)
+                    new Student("jisoo", 1),
+                    new Student("jennie", 2),
+                    new Student("rose", 2),
+                    new Student("lisa", 4)
             )
     );
 
