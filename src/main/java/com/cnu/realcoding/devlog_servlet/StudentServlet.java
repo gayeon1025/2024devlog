@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 // GET
 // 전체 학생 조회 : /students
@@ -31,9 +32,31 @@ public class StudentServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getPathInfo();
         if (name == null) {
-            getAllStudents(response);
+            String gardeParam = request.getParameter("grade");
+            if (gardeParam == null) {
+                getAllStudents(response);
+            } else {
+                Integer grade = Integer.parseInt(gardeParam);
+                getStudentsByGrade(grade, response);
+            }
         } else {
             getStudentByName(name, response);
+        }
+    }
+
+    private void getStudentsByGrade(Integer grade, HttpServletResponse response) throws IOException {
+        List<Student> studentsByGrade = students.stream()
+                .filter(it -> Objects.equals(it.grade(), grade))
+                .toList();
+
+        if (studentsByGrade.isEmpty()) {
+            response.setStatus(404);
+        } else {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String responseJson = objectMapper.writeValueAsString(studentsByGrade);
+            response.setStatus(200);
+            response.setContentType("application/json");
+            response.getWriter().print(responseJson);
         }
     }
 
